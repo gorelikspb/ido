@@ -1,0 +1,13 @@
+# Иконки для PWA (если будут добавлены)
+icon-*.png
+
+# IDE файлы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS файлы
+.DS_Store
+Thumbs.db
+

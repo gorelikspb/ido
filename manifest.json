@@ -1,0 +1,12 @@
+{
+  "name": "Мой Туду-лист",
+  "short_name": "Туду-лист",
+  "description": "Простой туду-лист для веб и мобильных устройств",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#6366f1",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "icons": []
+}
+

@@ -1,0 +1,18 @@
+name = "ido-todos"
+compatibility_date = "2024-01-01"
+
+# KV Namespace для хранения данных
+# Инструкция: CLOUDFLARE_KV_SETUP.md
+# 
+# Создайте KV namespace через:
+# 1. Cloudflare Dashboard → Workers & Pages → KV → Create a namespace
+# 2. Или через CLI: wrangler kv:namespace create "TODOS_KV"
+#
+# Затем замените YOUR_KV_NAMESPACE_ID на реальный ID
+[[kv_namespaces]]
+binding = "TODOS_KV"
+id = "YOUR_KV_NAMESPACE_ID"  # ⚠️ Замените на реальный ID после создания
+
+# Примечание: Если деплоите через Cloudflare Pages Dashboard,
+# привязку KV можно настроить в настройках проекта → Functions → KV Namespace Bindings
+
