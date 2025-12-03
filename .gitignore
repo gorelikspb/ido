@@ -1,5 +1,7 @@
 # Иконки для PWA (если будут добавлены)
 icon-*.png
+# Или в public/
+public/icon-*.png
 
 # IDE файлы
 .vscode/
@@ -10,4 +12,17 @@ icon-*.png
 # OS файлы
 .DS_Store
 Thumbs.db
+
+# Документация проекта (инструкции, отчеты) - НЕ коммитить в публичный репо
+docs/
+# Альтернативные названия папок для документации
+project-docs/
+project-instructions/
+reports/
+
+# Конфигурационные файлы с секретами
+wrangler.toml
+.env
+.env.local
+*.config.local
 
