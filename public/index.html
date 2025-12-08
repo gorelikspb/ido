@@ -25,19 +25,30 @@
         </header>
 
         <div class="input-section">
-            <input 
-                type="text" 
-                id="todo-input" 
-                placeholder="Добавить новую задачу..." 
-                autocomplete="off"
-            >
-            <button id="add-btn" aria-label="Добавить задачу">+</button>
+            <div class="input-with-project">
+                <input 
+                    type="text" 
+                    id="todo-input" 
+                    placeholder="Добавить новую задачу..." 
+                    autocomplete="off"
+                >
+                <select id="project-select" title="Выбрать проект">
+                    <option value="">Без проекта</option>
+                </select>
+                <button id="add-btn" aria-label="Добавить задачу">+</button>
+            </div>
+            <div class="project-hint">
+                <small>Или используйте #проект в тексте задачи</small>
+            </div>
         </div>
 
         <div class="filter-section">
             <button class="filter-btn active" data-filter="all">Все</button>
             <button class="filter-btn" data-filter="active">Активные</button>
             <button class="filter-btn" data-filter="completed">Выполненные</button>
+            <button class="filter-btn" data-filter="project" id="project-filter-btn" style="display: none;">
+                <span id="project-filter-text">Проект</span> <span id="project-filter-close">×</span>
+            </button>
         </div>
 
         <ul id="todo-list" class="todo-list"></ul>

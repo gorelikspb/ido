@@ -55,10 +55,48 @@ header h1 {
 }
 
 .input-section {
-    display: flex;
-    gap: 8px;
     padding: 20px;
     border-bottom: 1px solid var(--border-color);
+}
+
+.input-with-project {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.project-hint {
+    padding-top: 4px;
+    text-align: center;
+}
+
+.project-hint small {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+#project-select {
+    padding: 14px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 14px;
+    background: white;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+    min-width: 120px;
+    max-width: 150px;
+    flex-shrink: 0;
+}
+
+#project-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+#project-select:hover {
+    border-color: var(--primary-color);
 }
 
 #todo-input {
@@ -135,6 +173,29 @@ header h1 {
     color: white;
 }
 
+#project-filter-btn {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#project-filter-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+#project-filter-close {
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+#project-filter-close:hover {
+    opacity: 1;
+}
+
 .todo-list {
     list-style: none;
     max-height: 60vh;
@@ -200,12 +261,36 @@ header h1 {
     font-weight: bold;
 }
 
-.todo-text {
+.todo-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.todo-text {
     font-size: 16px;
     line-height: 1.5;
     word-break: break-word;
     color: var(--text-primary);
+}
+
+.todo-project {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary-color);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-start;
+}
+
+.todo-project:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: scale(1.05);
 }
 
 .todo-item.completed .todo-text {
@@ -301,6 +386,15 @@ header h1 {
         font-size: 16px; /* Предотвращает зум на iOS */
     }
 
+    .input-with-project {
+        flex-wrap: wrap;
+    }
+
+    #project-select {
+        min-width: 100px;
+        max-width: 120px;
+    }
+
     .todo-item {
         padding: 14px 16px;
     }
@@ -337,6 +431,12 @@ header h1 {
     .clear-btn {
         background: var(--card-bg);
         color: var(--text-secondary);
+    }
+
+    #project-select {
+        background: var(--card-bg);
+        color: var(--text-primary);
+        border-color: var(--border-color);
     }
 }
 

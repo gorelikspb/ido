@@ -1,6 +1,7 @@
 // Состояние приложения
 let todos = [];
 let currentFilter = 'all';
+let currentProjectFilter = null; // Фильтр по проекту
 let syncEnabled = false;
 let userId = null;
 
@@ -15,6 +16,10 @@ const todoList = document.getElementById('todo-list');
 const totalCount = document.getElementById('total-count');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const clearCompletedBtn = document.getElementById('clear-completed');
+const projectSelect = document.getElementById('project-select');
+const projectFilterBtn = document.getElementById('project-filter-btn');
+const projectFilterText = document.getElementById('project-filter-text');
+const projectFilterClose = document.getElementById('project-filter-close');
 
 // Получение или создание User ID
 function getUserId() {
@@ -154,6 +159,7 @@ async function loadTodos() {
                 
                 // Сохраняем объединенные данные локально
                 saveTodosLocal();
+                updateProjectSelect(); // Обновляем список проектов
                 renderTodos();
                 updateStats();
                 syncEnabled = true;
@@ -295,30 +301,94 @@ function updateStats() {
     totalCount.textContent = activeCount;
 }
 
+// Парсинг проекта из текста (формат: #проект или #project)
+function parseProject(text) {
+    // Ищем теги вида #проект в тексте
+    const projectMatch = text.match(/#([^\s#]+)/);
+    if (projectMatch) {
+        return projectMatch[1].toLowerCase();
+    }
+    return null;
+}
+
+// Удаление тега проекта из текста
+function removeProjectTag(text) {
+    return text.replace(/#[^\s#]+/g, '').trim();
+}
+
+// Получение списка всех уникальных проектов
+function getAllProjects() {
+    const projects = new Set();
+    todos.forEach(todo => {
+        if (todo.project) {
+            projects.add(todo.project);
+        }
+    });
+    return Array.from(projects).sort();
+}
+
+// Обновление селектора проектов
+function updateProjectSelect() {
+    const projects = getAllProjects();
+    const currentValue = projectSelect.value;
+    
+    // Очищаем опции кроме "Без проекта"
+    projectSelect.innerHTML = '<option value="">Без проекта</option>';
+    
+    // Добавляем все проекты
+    projects.forEach(project => {
+        const option = document.createElement('option');
+        option.value = project;
+        option.textContent = project;
+        projectSelect.appendChild(option);
+    });
+    
+    // Восстанавливаем выбранное значение
+    if (currentValue && projects.includes(currentValue)) {
+        projectSelect.value = currentValue;
+    }
+}
+
 // Добавление новой задачи
 function addTodo() {
-    const text = todoInput.value.trim();
+    let text = todoInput.value.trim();
     if (text === '') return;
+
+    // Получаем проект из селектора или из текста
+    let project = projectSelect.value || null;
+    
+    // Если проект не выбран, пытаемся найти в тексте
+    if (!project) {
+        project = parseProject(text);
+        if (project) {
+            // Удаляем тег проекта из текста
+            text = removeProjectTag(text);
+        }
+    }
 
     const newTodo = {
         id: Date.now(),
         text: text,
         completed: false,
+        project: project,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
     };
 
     todos.unshift(newTodo);
     saveTodos();
+    updateProjectSelect();
     renderTodos();
     
     todoInput.value = '';
+    projectSelect.value = '';
     todoInput.focus();
 }
 
 // Удаление задачи
 function deleteTodo(id) {
     todos = todos.filter(todo => todo.id !== id);
+    updateProjectSelect(); // Обновляем список проектов
     saveTodos();
     renderTodos();
 }
@@ -339,20 +409,34 @@ function toggleTodo(id) {
 // Очистка выполненных задач
 function clearCompleted() {
     todos = todos.filter(todo => !todo.completed);
+    updateProjectSelect(); // Обновляем список проектов
     saveTodos();
     renderTodos();
 }
 
 // Фильтрация задач
 function getFilteredTodos() {
+    let filtered = todos;
+    
+    // Фильтр по статусу (все/активные/выполненные)
     switch (currentFilter) {
         case 'active':
-            return todos.filter(todo => !todo.completed);
+            filtered = filtered.filter(todo => !todo.completed);
+            break;
         case 'completed':
-            return todos.filter(todo => todo.completed);
+            filtered = filtered.filter(todo => todo.completed);
+            break;
         default:
-            return todos;
+            // 'all' - без фильтра по статусу
+            break;
     }
+    
+    // Фильтр по проекту
+    if (currentProjectFilter) {
+        filtered = filtered.filter(todo => todo.project === currentProjectFilter);
+    }
+    
+    return filtered;
 }
 
 // Рендеринг списка задач
@@ -383,7 +467,10 @@ function renderTodos() {
                 ${todo.completed ? 'checked' : ''}
                 onchange="toggleTodo(${todo.id})"
             >
-            <span class="todo-text">${escapeHtml(todo.text)}</span>
+            <div class="todo-content">
+                <span class="todo-text">${escapeHtml(todo.text)}</span>
+                ${todo.project ? `<span class="todo-project" onclick="filterByProject('${escapeHtml(todo.project)}')">#${escapeHtml(todo.project)}</span>` : ''}
+            </div>
             <button 
                 class="todo-delete" 
                 onclick="deleteTodo(${todo.id})"
@@ -410,10 +497,40 @@ todoInput.addEventListener('keypress', (e) => {
 
 clearCompletedBtn.addEventListener('click', clearCompleted);
 
+// Фильтрация по проекту
+function filterByProject(project) {
+    if (currentProjectFilter === project) {
+        // Если уже фильтруем по этому проекту - снимаем фильтр
+        currentProjectFilter = null;
+        projectFilterBtn.style.display = 'none';
+    } else {
+        // Устанавливаем фильтр по проекту
+        currentProjectFilter = project;
+        projectFilterText.textContent = project;
+        projectFilterBtn.style.display = 'inline-block';
+    }
+    renderTodos();
+}
+
+// Снятие фильтра по проекту
+projectFilterClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentProjectFilter = null;
+    projectFilterBtn.style.display = 'none';
+    renderTodos();
+});
+
 // Фильтры
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
+        // Игнорируем клик на кнопке фильтра проекта
+        if (btn.id === 'project-filter-btn') return;
+        
+        filterBtns.forEach(b => {
+            if (b.id !== 'project-filter-btn') {
+                b.classList.remove('active');
+            }
+        });
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
         renderTodos();
@@ -437,6 +554,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Загружаем данные (сначала локальные для быстрого отображения, затем синхронизируем)
     await loadTodos();
+    updateProjectSelect(); // Обновляем список проектов после загрузки
     todoInput.focus();
     
     // Периодическая синхронизация (каждые 30 секунд)
