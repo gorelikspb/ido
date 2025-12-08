@@ -8,6 +8,7 @@ public/icon-*.png
 .idea/
 *.swp
 *.swo
+*.code-workspace
 
 # OS файлы
 .DS_Store
