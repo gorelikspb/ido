@@ -440,3 +440,197 @@ header h1 {
     }
 }
 
+/* Переключатель режимов */
+.mode-switcher {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-color);
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid var(--border-color);
+    background: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
+}
+
+.mode-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.mode-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Раздел проектов */
+.projects-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.projects-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.add-project-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--primary-color);
+    background: white;
+    color: var(--primary-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-project-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.projects-list {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.project-group {
+    margin-bottom: 24px;
+}
+
+.project-group h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.project-card {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+}
+
+.project-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.project-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.project-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.project-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+
+.project-card:hover .project-btn {
+    opacity: 1;
+}
+
+.project-btn:hover {
+    background: var(--bg-color);
+    transform: scale(1.1);
+}
+
+.project-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.project-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.project-stat-label {
+    color: var(--text-secondary);
+}
+
+.project-stat-value {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.project-notes {
+    margin-top: 8px;
+    padding: 8px;
+    background: var(--bg-color);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Мобильные устройства - проекты */
+@media (max-width: 640px) {
+    .projects-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .add-project-btn {
+        width: 100%;
+    }
+
+    .project-card {
+        padding: 12px;
+    }
+
+    .project-name {
+        font-size: 16px;
+    }
+}
+

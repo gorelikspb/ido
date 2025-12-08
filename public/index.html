@@ -24,37 +24,55 @@
             </div>
         </header>
 
-        <div class="input-section">
-            <div class="input-with-project">
-                <input 
-                    type="text" 
-                    id="todo-input" 
-                    placeholder="Добавить новую задачу..." 
-                    autocomplete="off"
-                >
-                <select id="project-select" title="Выбрать проект">
-                    <option value="">Без проекта</option>
-                </select>
-                <button id="add-btn" aria-label="Добавить задачу">+</button>
-            </div>
-            <div class="project-hint">
-                <small>Или используйте #проект в тексте задачи</small>
-            </div>
+        <!-- Переключатель режимов -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" data-mode="todos" id="mode-todos">Задачи</button>
+            <button class="mode-btn" data-mode="projects" id="mode-projects">Проекты</button>
         </div>
 
-        <div class="filter-section">
-            <button class="filter-btn active" data-filter="all">Все</button>
-            <button class="filter-btn" data-filter="active">Активные</button>
-            <button class="filter-btn" data-filter="completed">Выполненные</button>
-            <button class="filter-btn" data-filter="project" id="project-filter-btn" style="display: none;">
-                <span id="project-filter-text">Проект</span> <span id="project-filter-close">×</span>
-            </button>
+        <!-- Раздел проектов (скрыт по умолчанию) -->
+        <div id="projects-section" style="display: none;">
+            <div class="projects-header">
+                <h2>Pet-проекты</h2>
+                <button id="add-project-btn" class="add-project-btn">+ Новый проект</button>
+            </div>
+            <div id="projects-list" class="projects-list"></div>
         </div>
 
-        <ul id="todo-list" class="todo-list"></ul>
+        <!-- Раздел задач -->
+        <div id="todos-section">
+            <div class="input-section">
+                <div class="input-with-project">
+                    <input 
+                        type="text" 
+                        id="todo-input" 
+                        placeholder="Добавить новую задачу..." 
+                        autocomplete="off"
+                    >
+                    <select id="project-select" title="Выбрать проект">
+                        <option value="">Без проекта</option>
+                    </select>
+                    <button id="add-btn" aria-label="Добавить задачу">+</button>
+                </div>
+                <div class="project-hint">
+                    <small>Или используйте #проект в тексте задачи</small>
+                </div>
+            </div>
 
-        <div class="footer-actions">
-            <button id="clear-completed" class="clear-btn">Очистить выполненные</button>
+            <div class="filter-section">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="active">Активные</button>
+                <button class="filter-btn" data-filter="completed">Выполненные</button>
+                <button class="filter-btn" data-filter="project" id="project-filter-btn" style="display: none;">
+                    <span id="project-filter-text">Проект</span> <span id="project-filter-close">×</span>
+                </button>
+            </div>
+
+            <ul id="todo-list" class="todo-list"></ul>
+
+            <div class="footer-actions">
+                <button id="clear-completed" class="clear-btn">Очистить выполненные</button>
+            </div>
         </div>
     </div>
 

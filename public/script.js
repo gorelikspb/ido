@@ -1,7 +1,9 @@
 // Состояние приложения
 let todos = [];
+let projects = []; // Список проектов
 let currentFilter = 'all';
 let currentProjectFilter = null; // Фильтр по проекту
+let currentMode = 'todos'; // 'todos' или 'projects'
 let syncEnabled = false;
 let userId = null;
 
@@ -20,6 +22,12 @@ const projectSelect = document.getElementById('project-select');
 const projectFilterBtn = document.getElementById('project-filter-btn');
 const projectFilterText = document.getElementById('project-filter-text');
 const projectFilterClose = document.getElementById('project-filter-close');
+const modeTodosBtn = document.getElementById('mode-todos');
+const modeProjectsBtn = document.getElementById('mode-projects');
+const todosSection = document.getElementById('todos-section');
+const projectsSection = document.getElementById('projects-section');
+const projectsList = document.getElementById('projects-list');
+const addProjectBtn = document.getElementById('add-project-btn');
 
 // Получение или создание User ID
 function getUserId() {
@@ -235,7 +243,22 @@ function mergeTodos(localTodos, cloudTodos) {
 // Сохранение данных в localStorage
 function saveTodosLocal() {
     localStorage.setItem('todos', JSON.stringify(todos));
+    localStorage.setItem('projects', JSON.stringify(projects));
     updateStats();
+}
+
+// Загрузка проектов из localStorage
+function loadProjectsLocal() {
+    const saved = localStorage.getItem('projects');
+    if (saved) {
+        try {
+            projects = JSON.parse(saved);
+        } catch (e) {
+            projects = [];
+        }
+    } else {
+        projects = [];
+    }
 }
 
 // Debounce для экономии операций KV (сохраняем через 2 секунды после последнего изменения)
@@ -537,6 +560,177 @@ filterBtns.forEach(btn => {
     });
 });
 
+// ========== УПРАВЛЕНИЕ ПРОЕКТАМИ ==========
+
+// Добавление нового проекта
+function addProject() {
+    const name = prompt('Название проекта:');
+    if (!name || name.trim() === '') return;
+    
+    const newProject = {
+        id: Date.now(),
+        name: name.trim(),
+        status: 'active', // active, paused, postponed
+        timeSpent: 0, // в часах
+        notes: '',
+        lastUpdated: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+    };
+    
+    projects.unshift(newProject);
+    saveTodosLocal();
+    renderProjects();
+}
+
+// Редактирование проекта
+function editProject(id) {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    
+    // Простое редактирование через prompt (можно улучшить модальным окном)
+    const action = prompt(
+        `Проект: ${project.name}\n\n` +
+        `1 - Изменить название\n` +
+        `2 - Изменить статус\n` +
+        `3 - Добавить время работы (часы)\n` +
+        `4 - Добавить заметку\n\n` +
+        `Введите номер действия:`
+    );
+    
+    if (!action) return;
+    
+    switch(action.trim()) {
+        case '1':
+            const newName = prompt('Новое название:', project.name);
+            if (newName && newName.trim()) {
+                project.name = newName.trim();
+                project.lastUpdated = new Date().toISOString();
+            }
+            break;
+        case '2':
+            const status = prompt('Статус (active/paused/postponed):', project.status);
+            if (status && ['active', 'paused', 'postponed'].includes(status)) {
+                project.status = status;
+                project.lastUpdated = new Date().toISOString();
+            }
+            break;
+        case '3':
+            const hours = prompt('Сколько часов добавить?', '0');
+            const hoursNum = parseFloat(hours);
+            if (!isNaN(hoursNum) && hoursNum >= 0) {
+                project.timeSpent = (project.timeSpent || 0) + hoursNum;
+                project.lastUpdated = new Date().toISOString();
+            }
+            break;
+        case '4':
+            const note = prompt('Заметка:', project.notes || '');
+            if (note !== null) {
+                project.notes = note;
+                project.lastUpdated = new Date().toISOString();
+            }
+            break;
+    }
+    
+    saveTodosLocal();
+    renderProjects();
+}
+
+// Удаление проекта
+function deleteProject(id) {
+    if (confirm('Удалить проект?')) {
+        projects = projects.filter(p => p.id !== id);
+        saveTodosLocal();
+        renderProjects();
+    }
+}
+
+// Отображение проектов
+function renderProjects() {
+    if (projects.length === 0) {
+        projectsList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🚀</div>
+                <div class="empty-state-text">Нет проектов. Добавьте первый!</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Группируем по статусу
+    const activeProjects = projects.filter(p => p.status === 'active');
+    const pausedProjects = projects.filter(p => p.status === 'paused');
+    const postponedProjects = projects.filter(p => p.status === 'postponed');
+    
+    let html = '';
+    
+    if (activeProjects.length > 0) {
+        html += '<div class="project-group"><h3>🟢 Активные</h3>';
+        html += activeProjects.map(p => renderProjectCard(p)).join('');
+        html += '</div>';
+    }
+    
+    if (pausedProjects.length > 0) {
+        html += '<div class="project-group"><h3>⏸️ На паузе</h3>';
+        html += pausedProjects.map(p => renderProjectCard(p)).join('');
+        html += '</div>';
+    }
+    
+    if (postponedProjects.length > 0) {
+        html += '<div class="project-group"><h3>📅 Отложено</h3>';
+        html += postponedProjects.map(p => renderProjectCard(p)).join('');
+        html += '</div>';
+    }
+    
+    projectsList.innerHTML = html;
+}
+
+// Рендеринг карточки проекта
+function renderProjectCard(project) {
+    const lastUpdated = project.lastUpdated ? new Date(project.lastUpdated).toLocaleDateString('ru-RU') : '—';
+    const timeSpent = project.timeSpent || 0;
+    
+    return `
+        <div class="project-card" data-id="${project.id}">
+            <div class="project-card-header">
+                <h4 class="project-name">${escapeHtml(project.name)}</h4>
+                <div class="project-actions">
+                    <button class="project-btn" onclick="editProject(${project.id})" title="Редактировать">✏️</button>
+                    <button class="project-btn" onclick="deleteProject(${project.id})" title="Удалить">🗑️</button>
+                </div>
+            </div>
+            <div class="project-card-body">
+                <div class="project-stat">
+                    <span class="project-stat-label">Время работы:</span>
+                    <span class="project-stat-value">${timeSpent.toFixed(1)} ч</span>
+                </div>
+                <div class="project-stat">
+                    <span class="project-stat-label">Обновлено:</span>
+                    <span class="project-stat-value">${lastUpdated}</span>
+                </div>
+                ${project.notes ? `<div class="project-notes">${escapeHtml(project.notes)}</div>` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Переключение режимов
+function switchMode(mode) {
+    currentMode = mode;
+    
+    if (mode === 'todos') {
+        todosSection.style.display = 'block';
+        projectsSection.style.display = 'none';
+        modeTodosBtn.classList.add('active');
+        modeProjectsBtn.classList.remove('active');
+    } else {
+        todosSection.style.display = 'none';
+        projectsSection.style.display = 'block';
+        modeTodosBtn.classList.remove('active');
+        modeProjectsBtn.classList.add('active');
+        renderProjects();
+    }
+}
+
 // Периодическая синхронизация (каждые 30 секунд)
 let syncInterval = null;
 
@@ -552,9 +746,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentUserId = getUserId();
     console.log('👤 User ID:', currentUserId);
     
+    // Загружаем проекты из localStorage
+    loadProjectsLocal();
+    
     // Загружаем данные (сначала локальные для быстрого отображения, затем синхронизируем)
     await loadTodos();
     updateProjectSelect(); // Обновляем список проектов после загрузки
+    
+    // Обработчики переключения режимов
+    modeTodosBtn.addEventListener('click', () => switchMode('todos'));
+    modeProjectsBtn.addEventListener('click', () => switchMode('projects'));
+    addProjectBtn.addEventListener('click', addProject);
+    
     todoInput.focus();
     
     // Периодическая синхронизация (каждые 30 секунд)
